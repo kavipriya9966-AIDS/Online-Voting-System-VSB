@@ -1,0 +1,94 @@
+🗳️ ONLINE VOTING SYSTEM – PROJECT REPORT
+
+ 1. Introduction:
+
+An Online Voting System is a web-based application that allows users to vote securely from anywhere. It replaces traditional paper voting and ensures accuracy, transparency, and efficiency.
+
+2. Objectives:
+
+To create a secure digital voting platform
+To reduce manual errors in elections
+To provide fast and reliable results
+To ensure one person can vote only once.
+
+3. Features:
+
+User Registration & Login
+Admin Panel for managing elections
+Candidate List Display
+Secure Voting System
+Real-time Vote Counting
+Result Declaration
+
+4. Technologies Used:
+
+Frontend:
+HTML
+CSS
+JavaScript
+
+Backend:
+Node.js / Express.js (or Python Flask if you prefer)
+
+Database:
+MySQL (or MongoDB)
+
+5. System Architecture:
+
+User interacts through browser
+Frontend sends request to backend server
+Backend processes data
+Database stores users, votes, candidates.
+
+6. Database Design:
+
+Users Table
+user_id
+name
+email
+password
+has_voted
+Candidates Table
+candidate_id
+name
+party
+Votes Table
+vote_id
+user_id
+candidate_id
+
+7.How It Works:
+
+User registers and logs in
+Admin adds candidates
+User selects a candidate
+Vote is recorded in database
+User cannot vote again
+Results are calculated automatically.
+
+8.Security Features:
+
+Authentication system
+One vote per user restriction
+Data stored securely in database
+
+9.Future Enhancements:
+
+OTP / Aadhaar-based authentication
+Blockchain-based voting
+Mobile app integration
+Advanced admin dashboard.
+
+10.Advantages:
+
+Fast and accurate voting
+Saves time and paper
+Easy to use interface
+Accessible from anywhere.
+
+11.Limitations:
+
+Requires internet connection
+Basic security (can be improved).
+
+
