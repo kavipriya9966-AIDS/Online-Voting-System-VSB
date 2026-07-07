@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureVote | Election Results Tracking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#006d4a",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-secondary-container": "#2a4486",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#dbe1ff",
+                        "outline-variant": "#c3c5d8",
+                        "on-background": "#0b1c30",
+                        "inverse-primary": "#b6c4ff",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary": "#005237",
+                        "secondary-fixed-dim": "#b3c5ff",
+                        "on-secondary-fixed-variant": "#2a4386",
+                        "on-tertiary-fixed": "#002113",
+                        "on-secondary-fixed": "#00174a",
+                        "secondary-container": "#9cb4fe",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#d1d8ff",
+                        "primary-container": "#004eeb",
+                        "surface": "#f8f9ff",
+                        "primary": "#003ab5",
+                        "surface-variant": "#d3e4fe",
+                        "surface-tint": "#004de9",
+                        "primary-fixed": "#dce1ff",
+                        "surface-container-low": "#eff4ff",
+                        "background": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001550",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#003ab3",
+                        "on-tertiary-container": "#65f2b5",
+                        "outline": "#737687",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "tertiary-fixed": "#6ffbbe",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#e5eeff",
+                        "on-surface": "#0b1c30",
+                        "on-surface-variant": "#434656",
+                        "inverse-surface": "#213145",
+                        "secondary": "#435b9f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "stack-lg": "48px",
+                        "margin-mobile": "16px",
+                        "stack-sm": "12px",
+                        "gutter": "24px",
+                        "stack-md": "24px",
+                        "container-max": "800px"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Public Sans"],
+                        "headline-lg-mobile": ["Public Sans"],
+                        "label-sm": ["Public Sans"],
+                        "headline-md": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "body-lg": ["Public Sans"],
+                        "headline-lg": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .verification-code-input { font-family: 'Courier New', Courier, monospace; letter-spacing: 0.2em; }
+        .chart-bar-transition { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass-panel { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.8); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-background border-b border-outline-variant dark:border-outline">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-gutter max-w-container-max mx-auto">
+<div class="flex items-center gap-2">
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed">SecureVote</span>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low transition-colors px-3 py-2" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low transition-colors px-3 py-2" href="#">Ballots</a>
+<a class="text-primary dark:text-primary-fixed font-bold border-b-2 border-primary font-label-bold text-label-bold px-3 py-2" href="#">Results</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low transition-colors px-3 py-2" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="hidden md:inline text-label-sm font-label-sm text-tertiary">Status: Verified</span>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed cursor-pointer p-2 rounded-full hover:bg-surface-container-low">verified_user</span>
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed cursor-pointer p-2 rounded-full hover:bg-surface-container-low">help</span>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col h-full w-64 fixed left-0 top-0 py-stack-md px-4 bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant dark:border-outline z-40 mt-16">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary">person</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Voter Portal</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Identity Verified</p>
+</div>
+</div>
+<nav class="flex-grow space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-transform scale-95 active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-transform scale-95 active:scale-95" href="#">
+<span class="material-symbols-outlined">how_to_vote</span> Ballots
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container dark:bg-secondary-fixed-dim dark:text-on-secondary-fixed rounded-full font-label-bold text-label-bold transition-transform scale-95 active:scale-95" href="#">
+<span class="material-symbols-outlined">query_stats</span> Results
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-transform scale-95 active:scale-95" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+            </a>
+</nav>
+<div class="pt-6 border-t border-outline-variant">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant text-label-sm font-label-sm hover:text-primary" href="#">
+<span class="material-symbols-outlined">gavel</span> Legal
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant text-label-sm font-label-sm hover:text-primary" href="#">
+<span class="material-symbols-outlined">lock</span> Privacy
+            </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="pt-24 pb-20 px-margin-mobile md:px-gutter lg:ml-64 max-w-container-max mx-auto">
+<!-- Header Section -->
+<section class="mb-stack-md">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-tertiary/10 text-tertiary rounded-full text-label-sm font-label-sm mb-2">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1">shield_lock</span>
+                        Encrypted Real-Time Tally
+                    </span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">2024 Institutional Referendum</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Last updated: 2 minutes ago • 84% precincts reporting</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 border border-outline text-primary font-label-bold text-label-bold rounded-lg hover:bg-surface-container-low transition-colors">
+                        Download PDF Report
+                    </button>
+</div>
+</div>
+</section>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-stack-md mb-stack-lg">
+<!-- Real-time Bar Chart Card -->
+<div class="md:col-span-8 bg-surface-container-lowest border border-outline-variant p-6 rounded-xl">
+<h3 class="font-headline-md text-headline-md mb-6">Vote Distribution</h3>
+<div class="space-y-8">
+<!-- Candidate A -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Professional studio portrait of a mature political candidate with a confident expression, wearing a navy blue suit and standing against a neutral grey background. The lighting is crisp and formal, emphasizing trustworthiness and institutional authority in a modern corporate style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuaNrrHsfTlOrxdoqjTXB1xhYVz1jz3DgI3l8XrHbTl2a3XHxhzSh-7ueO5_a_mNvoui5wYTJW7rQzu0OCAq7VJnelWhgVFb0l0CHZnCnLD8Ja7-xVIFYC3QIK5gme0raoD-N3FKb3lWIKlPTVvO0ZO03sbR8qpJ6jxguqkcRmnrpL4k_tYqURwom0KjzzUOvNbSg1hAyFR5qEQzjlcPM9-xC3un0sBaOwK25bD7SLvfxSIUUyYGLv91pgriq2KzEzHQv3YrE7Hy0d"/>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Helena Vance</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Progressive Coalition</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-md text-headline-md text-primary">52.4%</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">1,240,402 votes</p>
+</div>
+</div>
+<div class="h-4 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary chart-bar-transition" style="width: 52.4%"></div>
+</div>
+</div>
+<!-- Candidate B -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A high-quality professional headshot of a candidate in their fifties, featuring a warm smile and approachable demeanor. They are wearing a sharp charcoal blazer over a white shirt, set against a soft-focus office environment that conveys professional leadership and stability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW4SL5zuEk9fWvj2VyYU21BYkVOiyAvfCkYqAKy3LbFBXlDsfRq2wo9NVvjJLv8UvVgDEKsqzO4zoVoZHsc-3_1M_v-j_Ha56GFLa8Mb1zQtHn4saUbybMGtpsKhtfW-iWHMbGFAfw7K_TYXMD4jc6Owk-o45cWnM7sqGbdvVfLtRcslCk2uqVnqCkNDZNTeZvjdJf8YhE0TDQmnX7grwARhpClVEWSOEqQ5k4gjD-lmTmHTS6eGEbOVV3fy5bCRo8JCQb1aPzBf7c"/>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Arthur Sterling</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Unity Alliance</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-md text-headline-md text-secondary">47.6%</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">1,126,890 votes</p>
+</div>
+</div>
+<div class="h-4 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary chart-bar-transition" style="width: 47.6%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Stats -->
+<div class="md:col-span-4 flex flex-col gap-4">
+<div class="bg-primary-container p-6 rounded-xl text-on-primary">
+<p class="text-label-sm font-label-sm opacity-80 uppercase tracking-widest">Turnout Rate</p>
+<h4 class="font-headline-lg text-[48px] leading-tight">68.2%</h4>
+<p class="text-body-md font-body-md mt-2">Highest participation in 12 years.</p>
+</div>
+<div class="bg-surface-container border border-outline-variant p-6 rounded-xl">
+<p class="text-label-sm font-label-bold text-on-surface-variant">Verification Status</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="material-symbols-outlined text-tertiary">lock</span>
+<p class="text-body-md font-body-md font-semibold text-on-surface">ZKP Validated</p>
+</div>
+<p class="text-label-sm font-label-sm mt-1 text-on-surface-variant">Cryptographic proof generated for all tallies.</p>
+</div>
+</div>
+<!-- Geographic Map Card -->
+<div class="md:col-span-12 bg-surface-container-lowest border border-outline-variant p-6 rounded-xl overflow-hidden relative min-h-[400px]">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline-md text-headline-md">Regional Distribution</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Vote density by precinct and district.</p>
+</div>
+<div class="flex gap-2">
+<button class="p-2 bg-surface rounded hover:bg-surface-container transition-colors border border-outline-variant">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="p-2 bg-surface rounded hover:bg-surface-container transition-colors border border-outline-variant">
+<span class="material-symbols-outlined">zoom_out</span>
+</button>
+</div>
+</div>
+<div class="w-full h-80 bg-surface-container-low rounded-lg relative overflow-hidden">
+<div class="w-full h-full opacity-50" data-location="New York" style="">
+<img class="w-full h-full object-cover grayscale opacity-40" data-alt="A highly detailed and stylized digital cartographic map of a modern metropolitan region, using a sophisticated dark blue and slate gray palette. Interactive highlight zones are rendered in vibrant primary blue and emerald green to indicate voting districts. The style is clean, technical, and reminiscent of a high-end data visualization dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlDZ6QlVK9kiWG23gUrx8wSy0Jk_ovJWn45FnJrnc5Z1k9989PyKwNO1A_YbEEjZJPGpTkPBPYWKFIXI3sKSihAfBIIfrsbp7LkNt2t4YkpDTfKv6_3kaP54xq_uGoKwzkFoWjYyiee2IKUV1UK9sJGVn7UwplU0p5FUlwobyE8S1EODoCBVvxtfOnLclIPYJCvzk9Z6WlfVHQKq8vNUe5Cg1w__EZJyjIhI-G2q1bFyzO0BMXdfW_BO2PFzSfSFmqLXvZ0s_cDHmG"/>
+</div>
+<!-- Mock Map Markers -->
+<div class="absolute top-1/4 left-1/3 w-4 h-4 bg-primary rounded-full animate-pulse"></div>
+<div class="absolute bottom-1/3 right-1/4 w-3 h-3 bg-secondary rounded-full"></div>
+<div class="absolute top-1/2 left-1/2 w-6 h-6 bg-primary/40 border-2 border-primary rounded-full"></div>
+<div class="absolute bottom-4 right-4 glass-panel p-4 rounded-lg border border-outline-variant shadow-lg max-w-[200px]">
+<p class="font-label-bold text-label-bold mb-2">District 04 Insight</p>
+<div class="flex justify-between text-label-sm">
+<span>Vance</span>
+<span class="font-bold">62%</span>
+</div>
+<div class="w-full h-1 bg-surface-container mt-1">
+<div class="h-full bg-primary" style="width: 62%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Verification Explorer -->
+<div class="md:col-span-12 bg-inverse-surface text-inverse-on-surface p-10 rounded-2xl relative overflow-hidden">
+<div class="absolute top-0 right-0 w-1/3 h-full opacity-10">
+<span class="material-symbols-outlined text-[300px] absolute -right-20 -top-10">fingerprint</span>
+</div>
+<div class="relative z-10 max-w-2xl">
+<h2 class="font-headline-lg text-headline-lg mb-4">Verification Explorer</h2>
+<p class="text-body-lg font-body-lg opacity-80 mb-8">Confirm your ballot has been counted in the global ledger. Enter your anonymous receipt hash to view its inclusion status without compromising your privacy.</p>
+<div class="space-y-4">
+<label class="font-label-bold text-label-bold block opacity-90">Ballot Receipt Hash (ZKP-SHA256)</label>
+<div class="flex flex-col sm:flex-row gap-4">
+<input class="flex-grow bg-white/10 border border-white/20 rounded-lg px-4 py-3 verification-code-input text-white focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="SV-XXXX-XXXX-XXXX" type="text"/>
+<button class="px-8 py-3 bg-primary-container text-on-primary font-label-bold text-label-bold rounded-lg hover:brightness-110 transition-all" onclick="simulateVerification()">
+                                Verify My Vote
+                            </button>
+</div>
+<p class="text-label-sm font-label-sm opacity-60">No personal data is linked to this hash. Verification uses zero-knowledge proofs.</p>
+</div>
+<!-- Result Placeholder (Hidden by default) -->
+<div class="hidden mt-8 p-6 bg-tertiary-container/30 border border-tertiary-fixed-dim/30 rounded-xl flex items-start gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500" id="verification-result">
+<div class="w-10 h-10 bg-tertiary-fixed text-on-tertiary-fixed rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">check_circle</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold">Ballot Verified</p>
+<p class="text-body-md font-body-md opacity-80">This hash was successfully matched with Block #8,421,902 in the decentralized tally ledger. Your vote was officially recorded on Nov 5, 2024, at 14:22:10 UTC.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-md bg-surface-dim dark:bg-inverse-surface border-t border-outline-variant dark:border-outline">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-gutter max-w-container-max mx-auto gap-4">
+<div class="text-center md:text-left">
+<p class="font-label-bold text-label-bold text-on-surface">SecureVote Institutional</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 SecureVote Institutional. All rights reserved. Cryptographically secured.</p>
+</div>
+<nav class="flex flex-wrap justify-center gap-4">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Accessibility</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Security Whitepaper</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Contact Support</a>
+</nav>
+</div>
+</footer>
+<script>
+        function simulateVerification() {
+            const result = document.getElementById('verification-result');
+            const button = event.target;
+            const originalText = button.innerText;
+            
+            button.disabled = true;
+            button.innerText = 'Verifying...';
+            button.classList.add('opacity-50');
+
+            setTimeout(() => {
+                result.classList.remove('hidden');
+                button.disabled = false;
+                button.innerText = originalText;
+                button.classList.remove('opacity-50');
+                
+                // Scroll into view
+                result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 1500);
+        }
+
+        // Add subtle animation to bars on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const bars = document.querySelectorAll('.chart-bar-transition');
+            bars.forEach(bar => {
+                const finalWidth = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = finalWidth;
+                }, 300);
+            });
+        });
+    </script>
+</body></html>
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureVote | Voter Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#006d4a",
+                    "surface-bright": "#f8f9ff",
+                    "surface-container-highest": "#d3e4fe",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-secondary-container": "#2a4486",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed": "#dbe1ff",
+                    "outline-variant": "#c3c5d8",
+                    "on-background": "#0b1c30",
+                    "inverse-primary": "#b6c4ff",
+                    "surface-variant": "#d3e4fe",
+                    "surface-tint": "#004de9",
+                    "primary-fixed": "#dce1ff",
+                    "surface-container-low": "#eff4ff",
+                    "background": "#f8f9ff",
+                    "surface-dim": "#cbdbf5",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#001550",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#003ab3",
+                    "on-tertiary-container": "#65f2b5",
+                    "outline": "#737687",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "tertiary-fixed": "#6ffbbe",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#e5eeff",
+                    "on-surface": "#0b1c30",
+                    "on-surface-variant": "#434656",
+                    "inverse-surface": "#213145",
+                    "secondary": "#435b9f",
+                    "primary": "#003ab5",
+                    "primary-container": "#004eeb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "stack-lg": "48px",
+                    "margin-mobile": "16px",
+                    "stack-sm": "12px",
+                    "gutter": "24px",
+                    "stack-md": "24px",
+                    "container-max": "800px"
+            },
+            "fontFamily": {
+                    "label-bold": ["Public Sans"],
+                    "headline-lg-mobile": ["Public Sans"],
+                    "label-sm": ["Public Sans"],
+                    "headline-md": ["Public Sans"],
+                    "body-md": ["Public Sans"],
+                    "body-lg": ["Public Sans"],
+                    "headline-lg": ["Public Sans"]
+            },
+            "fontSize": {
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Public Sans', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        .voter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-gutter max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary">SecureVote</span>
+</div>
+<div class="hidden md:flex items-center gap-6">
+<div class="flex items-center gap-2 px-3 py-1 bg-tertiary-fixed rounded-full">
+<span class="material-symbols-outlined text-on-tertiary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="font-label-sm text-label-sm text-on-tertiary-fixed">Status: Verified</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-low p-2 rounded-full transition-colors" data-icon="help">help</span>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">person</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<aside class="hidden md:flex h-full w-64 fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant flex-col py-stack-md px-4 z-40">
+<div class="mt-20 flex flex-col gap-8 h-full">
+<div class="flex items-center gap-3 px-4 mb-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container">
+<img class="w-full h-full object-cover" data-alt="A professional voter profile portrait in a minimalist, clean corporate photography style. The lighting is soft and neutral, with a solid light-blue background that matches the brand's primary color palette. The image conveys trust and institutional reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBulybeAumIoZeky4EMGgTtZWl41I4Jz2fs1zInAmoUdj6nrT3XOgihg_6C5vO5qT2dqqVNgV4Uul-yE-rft3WhfCBU36AGHglmRdU9KysLN4inmRi2snS6GWZE_a0PWas0E-ie9V69Ys6PLl52sOGdy9kqcWcjjA5hJ88P-I79--pi_s8A4lJCktS4jWmtf6ajmP0BEajV4AM6L1hZxUfTYuufoD6NeAxhkgkNh_rB7bABt0AISnaxK2gCT50kf_8E9UZ0k9zbPwMb"/>
+</div>
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-on-surface">Voter Portal</span>
+<span class="text-[11px] text-tertiary font-bold uppercase tracking-widest">Identity Verified</span>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-full transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-bold text-label-bold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="how_to_vote">how_to_vote</span>
+<span class="font-label-bold text-label-bold">Ballots</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-label-bold text-label-bold">Results</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-bold text-label-bold">Settings</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 border-t border-outline-variant pt-4">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="gavel">gavel</span>
+<span class="font-label-sm text-label-sm">Legal</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+<span class="font-label-sm text-label-sm">Privacy</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="pt-24 pb-16 md:pl-64 px-margin-mobile md:px-gutter max-w-screen-xl mx-auto">
+<div class="max-w-container-max mx-auto">
+<!-- Header Section -->
+<section class="mb-stack-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Voter Dashboard</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Welcome back, Representative Voter. Your terminal is secure.</p>
+</div>
+<div class="flex items-center gap-2 text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield_lock</span>
+<span class="font-label-bold text-label-bold">Last verified: 2 hours ago</span>
+</div>
+</div>
+</section>
+<!-- Grid Layout -->
+<div class="space-y-stack-md">
+<!-- Status Row (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Verification Card -->
+<div class="md:col-span-2 bg-white border border-outline-variant p-gutter flex flex-col justify-between relative overflow-hidden group">
+<div class="relative z-10">
+<h3 class="font-label-bold text-label-bold text-on-surface-variant mb-4 uppercase tracking-widest">Verification Status</h3>
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">Biometric Validated</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Your identity is cryptographically linked to the national voter registry.</p>
+</div>
+</div>
+</div>
+<div class="mt-6 flex gap-3 z-10">
+<button class="px-6 py-2 bg-primary text-white font-label-bold text-label-bold rounded hover:opacity-90 transition-opacity">Update Credentials</button>
+<button class="px-6 py-2 border border-outline text-on-surface font-label-bold text-label-bold rounded hover:bg-surface-container transition-colors">View Certificate</button>
+</div>
+<div class="absolute right-0 top-0 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[160px]" style="font-variation-settings: 'wght' 700;">fingerprint</span>
+</div>
+</div>
+<!-- Security Pulse -->
+<div class="bg-inverse-surface text-inverse-on-surface p-gutter flex flex-col justify-between">
+<div>
+<h3 class="font-label-bold text-label-bold opacity-70 mb-4 uppercase tracking-widest">Session Security</h3>
+<div class="flex items-center gap-2 mb-2">
+<div class="w-2 h-2 rounded-full bg-tertiary-fixed animate-pulse"></div>
+<p class="font-label-bold text-label-bold">End-to-End Encrypted</p>
+</div>
+<p class="font-label-sm text-label-sm opacity-60">IP: 192.168.1.XX<br/>Terminal ID: SV-9923-B</p>
+</div>
+<div class="bg-white/10 p-3 mt-4 border border-white/20">
+<p class="font-label-sm text-label-sm leading-relaxed">System using AES-256 GCM. Your private key is stored locally.</p>
+</div>
+</div>
+</div>
+<!-- Active Elections Section -->
+<section>
+<div class="flex items-center justify-between mb-stack-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface">Active Elections</h2>
+<span class="font-label-bold text-label-bold text-primary cursor-pointer hover:underline">View Eligibility Rules</span>
+</div>
+<div class="space-y-4">
+<!-- Election Card 1 -->
+<div class="bg-white border border-outline-variant p-gutter flex flex-col md:flex-row items-center gap-gutter hover:border-primary transition-all group cursor-pointer">
+<div class="w-20 h-20 bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="account_balance">account_balance</span>
+</div>
+<div class="flex-grow text-center md:text-left">
+<div class="flex flex-col md:flex-row md:items-center gap-2 mb-1">
+<h4 class="font-label-bold text-headline-md text-on-surface">2024 General Election</h4>
+<span class="md:ml-2 inline-block px-2 py-0.5 bg-error-container text-on-error-container font-label-sm text-[10px] rounded uppercase font-bold">Ends in 2 days</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Presidential, Senate, and State Representative ballots are currently open for your district (District 12).</p>
+</div>
+<div class="shrink-0">
+<button class="bg-primary-container text-white px-8 py-3 font-label-bold text-label-bold flex items-center gap-2 hover:bg-primary transition-colors">
+                                    Cast Ballot
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Election Card 2 -->
+<div class="bg-white border border-outline-variant p-gutter flex flex-col md:flex-row items-center gap-gutter opacity-80 hover:opacity-100 transition-all cursor-pointer">
+<div class="w-20 h-20 bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="location_city">location_city</span>
+</div>
+<div class="flex-grow text-center md:text-left">
+<div class="flex flex-col md:flex-row md:items-center gap-2 mb-1">
+<h4 class="font-label-bold text-headline-md text-on-surface">Local Council Vote</h4>
+<span class="md:ml-2 inline-block px-2 py-0.5 bg-tertiary-container text-on-tertiary-container font-label-sm text-[10px] rounded uppercase font-bold">Upcoming</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Budget allocations and neighborhood safety committee appointments. Registration opens next week.</p>
+</div>
+<div class="shrink-0">
+<button class="border border-outline text-on-surface-variant px-8 py-3 font-label-bold text-label-bold cursor-not-allowed">
+                                    Opens Oct 12
+                                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Voting History Section -->
+<section>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-sm">Voting History</h2>
+<div class="bg-white border border-outline-variant overflow-hidden">
+<table class="w-full border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="text-left px-gutter py-4 font-label-bold text-label-bold text-on-surface-variant">Election Name</th>
+<th class="text-left px-gutter py-4 font-label-bold text-label-bold text-on-surface-variant">Date Cast</th>
+<th class="text-left px-gutter py-4 font-label-bold text-label-bold text-on-surface-variant">Receipt Hash</th>
+<th class="text-right px-gutter py-4 font-label-bold text-label-bold text-on-surface-variant">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-gutter py-4 font-body-md text-body-md text-on-surface">2022 Midterm Election</td>
+<td class="px-gutter py-4 font-body-md text-body-md text-on-surface-variant">Nov 08, 2022</td>
+<td class="px-gutter py-4 font-body-md text-body-md font-mono text-xs text-primary">0x8a2...3f91</td>
+<td class="px-gutter py-4 text-right">
+<span class="inline-flex items-center gap-1 text-tertiary font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                            Counted
+                                        </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-gutter py-4 font-body-md text-body-md text-on-surface">Spring 2021 Referendum</td>
+<td class="px-gutter py-4 font-body-md text-body-md text-on-surface-variant">Apr 15, 2021</td>
+<td class="px-gutter py-4 font-body-md text-body-md font-mono text-xs text-primary">0xf3e...90bb</td>
+<td class="px-gutter py-4 text-right">
+<span class="inline-flex items-center gap-1 text-tertiary font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                            Counted
+                                        </span>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-gutter py-4 bg-surface-container-low text-center">
+<button class="text-primary font-label-bold text-label-bold hover:underline">Download Comprehensive Voting Record (PDF)</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="md:pl-64 w-full bg-surface-dim border-t border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-gutter max-w-container-max mx-auto py-stack-md gap-4">
+<div class="flex flex-col md:flex-row items-center gap-4">
+<span class="font-label-bold text-label-bold text-on-surface">SecureVote Institutional</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-center md:text-left">© 2024 SecureVote Institutional. All rights reserved. Cryptographically secured.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-4">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Accessibility</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security Whitepaper</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+<!-- Mobile Nav Bar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface border-t border-outline-variant flex justify-around items-center h-16 px-4 z-50">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[10px] font-bold">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="how_to_vote">how_to_vote</span>
+<span class="text-[10px] font-bold">Ballots</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="text-[10px] font-bold">Results</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction: Update session timer simulation
+        let timeLeft = 600; // 10 minutes
+        function updateTimer() {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                location.reload(); // Simple timeout simulation
+            }
+        }
+        setInterval(updateTimer, 1000);
+
+        // Simple smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body></html>
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureVote | Active Ballot</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Design System Implementation -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#006d4a",
+                    "surface-bright": "#f8f9ff",
+                    "surface-container-highest": "#d3e4fe",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-secondary-container": "#2a4486",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed": "#dbe1ff",
+                    "outline-variant": "#c3c5d8",
+                    "on-background": "#0b1c30",
+                    "inverse-primary": "#b6c4ff",
+                    "surface-container-high": "#dce9ff",
+                    "tertiary": "#005237",
+                    "secondary-fixed-dim": "#b3c5ff",
+                    "on-secondary-fixed-variant": "#2a4386",
+                    "on-tertiary-fixed": "#002113",
+                    "on-secondary-fixed": "#00174a",
+                    "secondary-container": "#9cb4fe",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "on-primary-container": "#d1d8ff",
+                    "primary-container": "#004eeb",
+                    "surface": "#f8f9ff",
+                    "primary": "#003ab5",
+                    "surface-variant": "#d3e4fe",
+                    "surface-tint": "#004de9",
+                    "primary-fixed": "#dce1ff",
+                    "surface-container-low": "#eff4ff",
+                    "background": "#f8f9ff",
+                    "surface-dim": "#cbdbf5",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#001550",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#003ab3",
+                    "on-tertiary-container": "#65f2b5",
+                    "outline": "#737687",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "tertiary-fixed": "#6ffbbe",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#e5eeff",
+                    "on-surface": "#0b1c30",
+                    "on-surface-variant": "#434656",
+                    "inverse-surface": "#213145",
+                    "secondary": "#435b9f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "stack-lg": "48px",
+                    "margin-mobile": "16px",
+                    "stack-sm": "12px",
+                    "gutter": "24px",
+                    "stack-md": "24px",
+                    "container-max": "800px"
+            },
+            "fontFamily": {
+                    "label-bold": ["Public Sans"],
+                    "headline-lg-mobile": ["Public Sans"],
+                    "label-sm": ["Public Sans"],
+                    "headline-md": ["Public Sans"],
+                    "body-md": ["Public Sans"],
+                    "body-lg": ["Public Sans"],
+                    "headline-lg": ["Public Sans"]
+            },
+            "fontSize": {
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .selection-active {
+            border: 2px solid #003ab5 !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 78, 235, 0.1), 0 4px 6px -2px rgba(0, 78, 235, 0.05);
+        }
+        .candidate-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .candidate-card:hover {
+            background-color: #eff4ff;
+        }
+        .voter-field {
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full bg-surface border-b border-outline-variant z-50">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-gutter max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary">SecureVote</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center gap-2 px-3 py-1 bg-tertiary-container/10 text-tertiary rounded-full">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="font-label-sm text-label-sm">Status: Verified</span>
+</div>
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors">help</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 px-margin-mobile md:px-0 max-w-container-max mx-auto">
+<!-- Progress Stepper -->
+<nav aria-label="Progress" class="mb-stack-lg">
+<div class="flex items-center justify-between w-full">
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-bold text-label-bold">1</div>
+<span class="font-label-sm text-label-sm text-primary">Identity</span>
+</div>
+<div class="flex-1 h-[2px] bg-primary mx-2 mb-6"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-bold text-label-bold">2</div>
+<span class="font-label-sm text-label-sm text-primary">Ballot</span>
+</div>
+<div class="flex-1 h-[2px] bg-outline-variant mx-2 mb-6"></div>
+<div class="flex flex-col items-center gap-2 opacity-50">
+<div class="w-8 h-8 rounded-full bg-outline-variant text-on-surface-variant flex items-center justify-center font-label-bold text-label-bold">3</div>
+<span class="font-label-sm text-label-sm">Review</span>
+</div>
+<div class="flex-1 h-[2px] bg-outline-variant mx-2 mb-6"></div>
+<div class="flex flex-col items-center gap-2 opacity-50">
+<div class="w-8 h-8 rounded-full bg-outline-variant text-on-surface-variant flex items-center justify-center font-label-bold text-label-bold">4</div>
+<span class="font-label-sm text-label-sm">Receipt</span>
+</div>
+</div>
+</nav>
+<!-- Election Header -->
+<header class="mb-stack-md">
+<div class="flex justify-between items-end mb-2">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">General Election 2024</h1>
+<span class="font-label-bold text-label-bold text-primary-container bg-primary/10 px-3 py-1 rounded-lg">Category: Presidential</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Please select one candidate from the choices below. Your selection is cryptographically anonymous once cast.</p>
+</header>
+<!-- Candidate Grid -->
+<section class="grid grid-cols-1 gap-stack-md" id="candidate-list">
+<!-- Candidate 1 -->
+<div class="candidate-card bg-surface-container-lowest border border-outline-variant rounded-xl p-4 cursor-pointer flex gap-4 group relative" onclick="selectCandidate(this)">
+<div class="absolute top-4 right-4 hidden group-[.selection-active]:block">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 overflow-hidden rounded-lg bg-surface-dim">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a middle-aged woman with a confident, friendly expression. She is wearing a structured navy blue blazer against a neutral grey background. The lighting is soft and corporate, evoking leadership, trust, and accessibility within a modern institutional framework. High resolution and sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNO5M5pX4OQesJhdqvJijMhoNxJpZdNjKu9oQBqx79Ci0hcTPgHh6UqMV2H_V3JGglNm2Pby5L7TxvuxQIisWhYtp7lfgMdnXR9o-rBBv_sIkN1Fp9fQBHe47uveIGE-w2ixVxIVWbUdrP-1vPOvFjZDj8EeEwIqJoqJ7LfenGptLQ_8LhLr_PXCqzmY2syW58oyhczyNJr_fm2TJ8HU0MVyr2YXAo1s_1HO28XO7nJtLbs7XT5_-nL1p7WARByRP5HNJWBnjFTop2"/>
+</div>
+<div class="flex flex-col justify-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Dr. Helena Vance</h3>
+<p class="font-label-bold text-label-bold text-secondary mb-2">Progressive Alliance Party</p>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 md:line-clamp-none">Former Secretary of Infrastructure with 20 years of experience in urban planning and economic revitalization. Committed to digital equity and green energy transition.</p>
+</div>
+</div>
+<!-- Candidate 2 -->
+<div class="candidate-card bg-surface-container-lowest border border-outline-variant rounded-xl p-4 cursor-pointer flex gap-4 group relative" onclick="selectCandidate(this)">
+<div class="absolute top-4 right-4 hidden group-[.selection-active]:block">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 overflow-hidden rounded-lg bg-surface-dim">
+<img class="w-full h-full object-cover" data-alt="A formal portrait of an older man with distinguished silver hair, wearing a dark grey suit and a burgundy tie. He has a calm, authoritative demeanor, standing in a wood-paneled office environment. The image uses traditional warm lighting to convey stability, wisdom, and institutional permanence, aligning with a corporate professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7zfM2MvYGHymBySdoqckXxqbBtGhZt93L3V6uOYdeEWPy7PQpoMTBa5yW6yepMHaO3RmM36ZDZyxtx2rpC9MnOGyeedvzHT55q3yH_N0PHRWMbq9X57LejDVK85G6Jf745Q4swm0osKplf1RV_hS8iRI4n_su-8XfqjOJxsXoKUXQ71EJVZpE_qp3mdjC86JukqONrUwLN9ips17U5XxW8XMKt3_lcslsY_lWAEzkx5htGBdp6SM5h2fFNSRrod3EK5xDPjC6fizC"/>
+</div>
+<div class="flex flex-col justify-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Marcus Thorne</h3>
+<p class="font-label-bold text-label-bold text-secondary mb-2">Stability &amp; Heritage Union</p>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 md:line-clamp-none">Three-term Senator and Constitutional Scholar. Focuses on fiscal responsibility, national security, and maintaining established trade agreements.</p>
+</div>
+</div>
+<!-- Candidate 3 -->
+<div class="candidate-card bg-surface-container-lowest border border-outline-variant rounded-xl p-4 cursor-pointer flex gap-4 group relative" onclick="selectCandidate(this)">
+<div class="absolute top-4 right-4 hidden group-[.selection-active]:block">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 overflow-hidden rounded-lg bg-surface-dim">
+<img class="w-full h-full object-cover" data-alt="A portrait of a young, dynamic male leader with a thoughtful and modern appearance. He is wearing a minimalist black turtleneck in a high-tech laboratory or modern architectural space with glass and soft blue ambient light. The visual style is innovative, clean, and futuristic, emphasizing forward-thinking leadership and technical expertise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq9QCEhZ-0OPtr_16hWOJ7KbaMjUqv3v9cNrt9R2hfAJlRoaLu7BPB52XQpybwB68cYtDOP0sBK7Wx0C6FULf6qsMRZ2YSsqEAN7As8itGCpmdtJI9cVXyo-L_sfrPbXn60mGkYCd98tkc5XRMmZQOtFK5TzyfFoUpLdRzw8_zk_ExWhD2PnbbixqpmF4YwUyAir2vuzVi51IXl8i9Lu0epByUm5TUNekCNl2QmWuRTAL_l5ewOAY-NsNqR9EioTbecigaJe7oeh2X"/>
+</div>
+<div class="flex flex-col justify-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Julian Aris</h3>
+<p class="font-label-bold text-label-bold text-secondary mb-2">Independent Tech Consensus</p>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 md:line-clamp-none">Entrepreneur and data scientist advocating for algorithmic transparency, direct democracy through secure platforms, and education reform.</p>
+</div>
+</div>
+<!-- Write-in Option -->
+<div class="candidate-card bg-surface-container-lowest border border-outline-variant rounded-xl p-4 cursor-pointer flex gap-4 group relative" onclick="selectCandidate(this)">
+<div class="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 overflow-hidden rounded-lg bg-surface-container flex items-center justify-center border-2 border-dashed border-outline-variant">
+<span class="material-symbols-outlined text-outline text-4xl">edit</span>
+</div>
+<div class="flex flex-col justify-center flex-grow">
+<h3 class="font-headline-md text-headline-md text-on-surface">Write-in Candidate</h3>
+<p class="font-label-bold text-label-bold text-secondary mb-2">Other</p>
+<div class="hidden group-[.selection-active]:block mt-2">
+<input class="w-full bg-surface border border-outline rounded px-3 py-2 font-body-md voter-field focus:ring-2 focus:ring-primary focus:outline-none" onclick="event.stopPropagation()" placeholder="Enter candidate name..." type="text"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Help Section -->
+<section class="mt-stack-lg p-gutter bg-surface-container-low rounded-xl border border-outline-variant/30 flex items-start gap-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">info</span>
+<div>
+<h4 class="font-label-bold text-label-bold text-on-surface">Voting Security Notice</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Your vote is protected by end-to-end encryption. Once you click "Review &amp; Submit", you will be given a verification code to check that your vote was counted correctly on the public ledger.</p>
+</div>
+</section>
+</main>
+<!-- Persistent Action Footer -->
+<footer class="fixed bottom-0 w-full bg-surface-container border-t border-outline-variant py-4 z-50">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-0 flex justify-between items-center">
+<button class="font-label-bold text-label-bold text-error border border-error px-6 py-3 rounded-lg hover:bg-error-container/10 transition-colors">
+                Reset Ballot
+            </button>
+<div class="flex items-center gap-4">
+<span class="hidden md:block font-label-sm text-label-sm text-on-surface-variant">Choice 1 of 1 selected</span>
+<button class="font-label-bold text-label-bold bg-primary text-on-primary px-8 py-3 rounded-lg opacity-50 cursor-not-allowed hover:bg-primary-tint transition-all flex items-center gap-2" disabled="" id="submit-btn">
+                    Review &amp; Submit
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- Loading Modal (Hidden by default) -->
+<div class="fixed inset-0 bg-inverse-surface/60 backdrop-blur-md z-[100] hidden flex items-center justify-center" id="loading-overlay">
+<div class="bg-surface p-stack-lg rounded-xl max-w-sm w-full text-center shadow-xl">
+<div class="mb-4 inline-block animate-spin">
+<span class="material-symbols-outlined text-primary text-5xl">sync</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2">Securing Your Vote</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">Generating cryptographic proof of selection and preparing for final submission...</p>
+<div class="w-full bg-surface-container rounded-full h-2">
+<div class="bg-primary h-full rounded-full animate-[progress_2s_ease-in-out_infinite]" style="width: 40%"></div>
+</div>
+</div>
+</div>
+<script>
+        function selectCandidate(element) {
+            // Remove selection from all cards
+            document.querySelectorAll('.candidate-card').forEach(card => {
+                card.classList.remove('selection-active');
+            });
+            
+            // Add selection to clicked card
+            element.classList.add('selection-active');
+            
+            // Enable submit button
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            // Subtle haptic feel (visual jump)
+            element.style.transform = 'scale(0.98)';
+            setTimeout(() => { element.style.transform = 'scale(1)'; }, 100);
+        }
+
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            if (this.disabled) return;
+            
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.remove('hidden');
+            
+            // Simulate processing
+            setTimeout(() => {
+                // In a real app, this would route to the Review page
+                alert("Cryptographic proof generated. Proceeding to review...");
+                overlay.classList.add('hidden');
+            }, 2500);
+        });
+
+        // Add some basic keyboard accessibility
+        document.querySelectorAll('.candidate-card').forEach(card => {
+            card.setAttribute('tabindex', '0');
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    selectCandidate(card);
+                }
+            });
+        });
+    </script>
+<style>
+        @keyframes progress {
+            0% { width: 0%; margin-left: 0%; }
+            50% { width: 40%; margin-left: 30%; }
+            100% { width: 0%; margin-left: 100%; }
+        }
+    </style>
+</body></html>
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureVote | Election Results Tracking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#006d4a",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-secondary-container": "#2a4486",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#dbe1ff",
+                        "outline-variant": "#c3c5d8",
+                        "on-background": "#0b1c30",
+                        "inverse-primary": "#b6c4ff",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary": "#005237",
+                        "secondary-fixed-dim": "#b3c5ff",
+                        "on-secondary-fixed-variant": "#2a4386",
+                        "on-tertiary-fixed": "#002113",
+                        "on-secondary-fixed": "#00174a",
+                        "secondary-container": "#9cb4fe",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#d1d8ff",
+                        "primary-container": "#004eeb",
+                        "surface": "#f8f9ff",
+                        "primary": "#003ab5",
+                        "surface-variant": "#d3e4fe",
+                        "surface-tint": "#004de9",
+                        "primary-fixed": "#dce1ff",
+                        "surface-container-low": "#eff4ff",
+                        "background": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001550",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#003ab3",
+                        "on-tertiary-container": "#65f2b5",
+                        "outline": "#737687",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "tertiary-fixed": "#6ffbbe",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#e5eeff",
+                        "on-surface": "#0b1c30",
+                        "on-surface-variant": "#434656",
+                        "inverse-surface": "#213145",
+                        "secondary": "#435b9f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "stack-lg": "48px",
+                        "margin-mobile": "16px",
+                        "stack-sm": "12px",
+                        "gutter": "24px",
+                        "stack-md": "24px",
+                        "container-max": "800px"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Public Sans"],
+                        "headline-lg-mobile": ["Public Sans"],
+                        "label-sm": ["Public Sans"],
+                        "headline-md": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "body-lg": ["Public Sans"],
+                        "headline-lg": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .verification-code-input { font-family: 'Courier New', Courier, monospace; letter-spacing: 0.2em; }
+        .chart-bar-transition { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass-panel { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.8); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-background border-b border-outline-variant dark:border-outline">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-gutter max-w-container-max mx-auto">
+<div class="flex items-center gap-2">
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed">SecureVote</span>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low transition-colors px-3 py-2" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low transition-colors px-3 py-2" href="#">Ballots</a>
+<a class="text-primary dark:text-primary-fixed font-bold border-b-2 border-primary font-label-bold text-label-bold px-3 py-2" href="#">Results</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low transition-colors px-3 py-2" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="hidden md:inline text-label-sm font-label-sm text-tertiary">Status: Verified</span>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed cursor-pointer p-2 rounded-full hover:bg-surface-container-low">verified_user</span>
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed cursor-pointer p-2 rounded-full hover:bg-surface-container-low">help</span>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col h-full w-64 fixed left-0 top-0 py-stack-md px-4 bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant dark:border-outline z-40 mt-16">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary">person</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Voter Portal</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Identity Verified</p>
+</div>
+</div>
+<nav class="flex-grow space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-transform scale-95 active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-transform scale-95 active:scale-95" href="#">
+<span class="material-symbols-outlined">how_to_vote</span> Ballots
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container dark:bg-secondary-fixed-dim dark:text-on-secondary-fixed rounded-full font-label-bold text-label-bold transition-transform scale-95 active:scale-95" href="#">
+<span class="material-symbols-outlined">query_stats</span> Results
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-transform scale-95 active:scale-95" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+            </a>
+</nav>
+<div class="pt-6 border-t border-outline-variant">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant text-label-sm font-label-sm hover:text-primary" href="#">
+<span class="material-symbols-outlined">gavel</span> Legal
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant text-label-sm font-label-sm hover:text-primary" href="#">
+<span class="material-symbols-outlined">lock</span> Privacy
+            </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="pt-24 pb-20 px-margin-mobile md:px-gutter lg:ml-64 max-w-container-max mx-auto">
+<!-- Header Section -->
+<section class="mb-stack-md">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-tertiary/10 text-tertiary rounded-full text-label-sm font-label-sm mb-2">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1">shield_lock</span>
+                        Encrypted Real-Time Tally
+                    </span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">2024 Institutional Referendum</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Last updated: 2 minutes ago • 84% precincts reporting</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 border border-outline text-primary font-label-bold text-label-bold rounded-lg hover:bg-surface-container-low transition-colors">
+                        Download PDF Report
+                    </button>
+</div>
+</div>
+</section>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-stack-md mb-stack-lg">
+<!-- Real-time Bar Chart Card -->
+<div class="md:col-span-8 bg-surface-container-lowest border border-outline-variant p-6 rounded-xl">
+<h3 class="font-headline-md text-headline-md mb-6">Vote Distribution</h3>
+<div class="space-y-8">
+<!-- Candidate A -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Professional studio portrait of a mature political candidate with a confident expression, wearing a navy blue suit and standing against a neutral grey background. The lighting is crisp and formal, emphasizing trustworthiness and institutional authority in a modern corporate style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuaNrrHsfTlOrxdoqjTXB1xhYVz1jz3DgI3l8XrHbTl2a3XHxhzSh-7ueO5_a_mNvoui5wYTJW7rQzu0OCAq7VJnelWhgVFb0l0CHZnCnLD8Ja7-xVIFYC3QIK5gme0raoD-N3FKb3lWIKlPTVvO0ZO03sbR8qpJ6jxguqkcRmnrpL4k_tYqURwom0KjzzUOvNbSg1hAyFR5qEQzjlcPM9-xC3un0sBaOwK25bD7SLvfxSIUUyYGLv91pgriq2KzEzHQv3YrE7Hy0d"/>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Helena Vance</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Progressive Coalition</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-md text-headline-md text-primary">52.4%</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">1,240,402 votes</p>
+</div>
+</div>
+<div class="h-4 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary chart-bar-transition" style="width: 52.4%"></div>
+</div>
+</div>
+<!-- Candidate B -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A high-quality professional headshot of a candidate in their fifties, featuring a warm smile and approachable demeanor. They are wearing a sharp charcoal blazer over a white shirt, set against a soft-focus office environment that conveys professional leadership and stability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW4SL5zuEk9fWvj2VyYU21BYkVOiyAvfCkYqAKy3LbFBXlDsfRq2wo9NVvjJLv8UvVgDEKsqzO4zoVoZHsc-3_1M_v-j_Ha56GFLa8Mb1zQtHn4saUbybMGtpsKhtfW-iWHMbGFAfw7K_TYXMD4jc6Owk-o45cWnM7sqGbdvVfLtRcslCk2uqVnqCkNDZNTeZvjdJf8YhE0TDQmnX7grwARhpClVEWSOEqQ5k4gjD-lmTmHTS6eGEbOVV3fy5bCRo8JCQb1aPzBf7c"/>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Arthur Sterling</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Unity Alliance</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-md text-headline-md text-secondary">47.6%</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">1,126,890 votes</p>
+</div>
+</div>
+<div class="h-4 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary chart-bar-transition" style="width: 47.6%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Stats -->
+<div class="md:col-span-4 flex flex-col gap-4">
+<div class="bg-primary-container p-6 rounded-xl text-on-primary">
+<p class="text-label-sm font-label-sm opacity-80 uppercase tracking-widest">Turnout Rate</p>
+<h4 class="font-headline-lg text-[48px] leading-tight">68.2%</h4>
+<p class="text-body-md font-body-md mt-2">Highest participation in 12 years.</p>
+</div>
+<div class="bg-surface-container border border-outline-variant p-6 rounded-xl">
+<p class="text-label-sm font-label-bold text-on-surface-variant">Verification Status</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="material-symbols-outlined text-tertiary">lock</span>
+<p class="text-body-md font-body-md font-semibold text-on-surface">ZKP Validated</p>
+</div>
+<p class="text-label-sm font-label-sm mt-1 text-on-surface-variant">Cryptographic proof generated for all tallies.</p>
+</div>
+</div>
+<!-- Geographic Map Card -->
+<div class="md:col-span-12 bg-surface-container-lowest border border-outline-variant p-6 rounded-xl overflow-hidden relative min-h-[400px]">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline-md text-headline-md">Regional Distribution</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Vote density by precinct and district.</p>
+</div>
+<div class="flex gap-2">
+<button class="p-2 bg-surface rounded hover:bg-surface-container transition-colors border border-outline-variant">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="p-2 bg-surface rounded hover:bg-surface-container transition-colors border border-outline-variant">
+<span class="material-symbols-outlined">zoom_out</span>
+</button>
+</div>
+</div>
+<div class="w-full h-80 bg-surface-container-low rounded-lg relative overflow-hidden">
+<div class="w-full h-full opacity-50" data-location="New York" style="">
+<img class="w-full h-full object-cover grayscale opacity-40" data-alt="A highly detailed and stylized digital cartographic map of a modern metropolitan region, using a sophisticated dark blue and slate gray palette. Interactive highlight zones are rendered in vibrant primary blue and emerald green to indicate voting districts. The style is clean, technical, and reminiscent of a high-end data visualization dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlDZ6QlVK9kiWG23gUrx8wSy0Jk_ovJWn45FnJrnc5Z1k9989PyKwNO1A_YbEEjZJPGpTkPBPYWKFIXI3sKSihAfBIIfrsbp7LkNt2t4YkpDTfKv6_3kaP54xq_uGoKwzkFoWjYyiee2IKUV1UK9sJGVn7UwplU0p5FUlwobyE8S1EODoCBVvxtfOnLclIPYJCvzk9Z6WlfVHQKq8vNUe5Cg1w__EZJyjIhI-G2q1bFyzO0BMXdfW_BO2PFzSfSFmqLXvZ0s_cDHmG"/>
+</div>
+<!-- Mock Map Markers -->
+<div class="absolute top-1/4 left-1/3 w-4 h-4 bg-primary rounded-full animate-pulse"></div>
+<div class="absolute bottom-1/3 right-1/4 w-3 h-3 bg-secondary rounded-full"></div>
+<div class="absolute top-1/2 left-1/2 w-6 h-6 bg-primary/40 border-2 border-primary rounded-full"></div>
+<div class="absolute bottom-4 right-4 glass-panel p-4 rounded-lg border border-outline-variant shadow-lg max-w-[200px]">
+<p class="font-label-bold text-label-bold mb-2">District 04 Insight</p>
+<div class="flex justify-between text-label-sm">
+<span>Vance</span>
+<span class="font-bold">62%</span>
+</div>
+<div class="w-full h-1 bg-surface-container mt-1">
+<div class="h-full bg-primary" style="width: 62%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Verification Explorer -->
+<div class="md:col-span-12 bg-inverse-surface text-inverse-on-surface p-10 rounded-2xl relative overflow-hidden">
+<div class="absolute top-0 right-0 w-1/3 h-full opacity-10">
+<span class="material-symbols-outlined text-[300px] absolute -right-20 -top-10">fingerprint</span>
+</div>
+<div class="relative z-10 max-w-2xl">
+<h2 class="font-headline-lg text-headline-lg mb-4">Verification Explorer</h2>
+<p class="text-body-lg font-body-lg opacity-80 mb-8">Confirm your ballot has been counted in the global ledger. Enter your anonymous receipt hash to view its inclusion status without compromising your privacy.</p>
+<div class="space-y-4">
+<label class="font-label-bold text-label-bold block opacity-90">Ballot Receipt Hash (ZKP-SHA256)</label>
+<div class="flex flex-col sm:flex-row gap-4">
+<input class="flex-grow bg-white/10 border border-white/20 rounded-lg px-4 py-3 verification-code-input text-white focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="SV-XXXX-XXXX-XXXX" type="text"/>
+<button class="px-8 py-3 bg-primary-container text-on-primary font-label-bold text-label-bold rounded-lg hover:brightness-110 transition-all" onclick="simulateVerification()">
+                                Verify My Vote
+                            </button>
+</div>
+<p class="text-label-sm font-label-sm opacity-60">No personal data is linked to this hash. Verification uses zero-knowledge proofs.</p>
+</div>
+<!-- Result Placeholder (Hidden by default) -->
+<div class="hidden mt-8 p-6 bg-tertiary-container/30 border border-tertiary-fixed-dim/30 rounded-xl flex items-start gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500" id="verification-result">
+<div class="w-10 h-10 bg-tertiary-fixed text-on-tertiary-fixed rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">check_circle</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold">Ballot Verified</p>
+<p class="text-body-md font-body-md opacity-80">This hash was successfully matched with Block #8,421,902 in the decentralized tally ledger. Your vote was officially recorded on Nov 5, 2024, at 14:22:10 UTC.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-md bg-surface-dim dark:bg-inverse-surface border-t border-outline-variant dark:border-outline">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-gutter max-w-container-max mx-auto gap-4">
+<div class="text-center md:text-left">
+<p class="font-label-bold text-label-bold text-on-surface">SecureVote Institutional</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 SecureVote Institutional. All rights reserved. Cryptographically secured.</p>
+</div>
+<nav class="flex flex-wrap justify-center gap-4">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Accessibility</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Security Whitepaper</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Contact Support</a>
+</nav>
+</div>
+</footer>
+<script>
+        function simulateVerification() {
+            const result = document.getElementById('verification-result');
+            const button = event.target;
+            const originalText = button.innerText;
+            
+            button.disabled = true;
+            button.innerText = 'Verifying...';
+            button.classList.add('opacity-50');
+
+            setTimeout(() => {
+                result.classList.remove('hidden');
+                button.disabled = false;
+                button.innerText = originalText;
+                button.classList.remove('opacity-50');
+                
+                // Scroll into view
+                result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 1500);
+        }
+
+        // Add subtle animation to bars on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const bars = document.querySelectorAll('.chart-bar-transition');
+            bars.forEach(bar => {
+                const finalWidth = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = finalWidth;
+                }, 300);
+            });
+        });
+    </script>
+</body></html>
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureVote | Election Results Tracking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#006d4a",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-secondary-container": "#2a4486",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#dbe1ff",
+                        "outline-variant": "#c3c5d8",
+                        "on-background": "#0b1c30",
+                        "inverse-primary": "#b6c4ff",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary": "#005237",
+                        "secondary-fixed-dim": "#b3c5ff",
+                        "on-secondary-fixed-variant": "#2a4386",
+                        "on-tertiary-fixed": "#002113",
+                        "on-secondary-fixed": "#00174a",
+                        "secondary-container": "#9cb4fe",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#d1d8ff",
+                        "primary-container": "#004eeb",
+                        "surface": "#f8f9ff",
+                        "primary": "#003ab5",
+                        "surface-variant": "#d3e4fe",
+                        "surface-tint": "#004de9",
+                        "primary-fixed": "#dce1ff",
+                        "surface-container-low": "#eff4ff",
+                        "background": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001550",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#003ab3",
+                        "on-tertiary-container": "#65f2b5",
+                        "outline": "#737687",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "tertiary-fixed": "#6ffbbe",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#e5eeff",
+                        "on-surface": "#0b1c30",
+                        "on-surface-variant": "#434656",
+                        "inverse-surface": "#213145",
+                        "secondary": "#435b9f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "stack-lg": "48px",
+                        "margin-mobile": "16px",
+                        "stack-sm": "12px",
+                        "gutter": "24px",
+                        "stack-md": "24px",
+                        "container-max": "800px"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Public Sans"],
+                        "headline-lg-mobile": ["Public Sans"],
+                        "label-sm": ["Public Sans"],
+                        "headline-md": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "body-lg": ["Public Sans"],
+                        "headline-lg": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .verification-code-input { font-family: 'Courier New', Courier, monospace; letter-spacing: 0.2em; }
+        .chart-bar-transition { transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass-panel { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.8); }
+        
+        /* Entrance Animations */
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-content { animation: slideUpFade 0.6s ease-out forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* Pulse for Live Indicator */
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+        .animate-pulse-live { animation: pulse-soft 2s infinite ease-in-out; }
+
+        /* Hover scale effect for bars */
+        .candidate-row { transition: background-color 0.2s ease; }
+        .candidate-row:hover { background-color: rgba(0, 0, 0, 0.02); }
+        .candidate-row:hover .chart-bar-container { transform: scaleY(1.2); }
+        .chart-bar-container { transition: transform 0.2s ease; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-background border-b border-outline-variant dark:border-outline">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-gutter max-w-container-max mx-auto">
+<div class="flex items-center gap-2">
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed">SecureVote</span>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low transition-colors px-3 py-2" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low transition-colors px-3 py-2" href="#">Ballots</a>
+<a class="text-primary dark:text-primary-fixed font-bold border-b-2 border-primary font-label-bold text-label-bold px-3 py-2" href="#">Results</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low transition-colors px-3 py-2" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="hidden md:inline text-label-sm font-label-sm text-tertiary">Status: Verified</span>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed cursor-pointer p-2 rounded-full hover:bg-surface-container-low active:scale-90 transition-transform">verified_user</span>
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed cursor-pointer p-2 rounded-full hover:bg-surface-container-low active:scale-90 transition-transform">help</span>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col h-full w-64 fixed left-0 top-0 py-stack-md px-4 bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant dark:border-outline z-40 mt-16">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary">person</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Voter Portal</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Identity Verified</p>
+</div>
+</div>
+<nav class="flex-grow space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-all active:scale-95 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-all active:scale-95 rounded-lg" href="#">
+<span class="material-symbols-outlined">how_to_vote</span> Ballots
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container dark:bg-secondary-fixed-dim dark:text-on-secondary-fixed rounded-full font-label-bold text-label-bold transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">query_stats</span> Results
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-all active:scale-95 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+        </a>
+</nav>
+<div class="pt-6 border-t border-outline-variant">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant text-label-sm font-label-sm hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">gavel</span> Legal
+        </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant text-label-sm font-label-sm hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">lock</span> Privacy
+        </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="pt-24 pb-20 px-margin-mobile md:px-gutter lg:ml-64 max-w-container-max mx-auto">
+<!-- Header Section -->
+<section class="mb-stack-md animate-content">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-tertiary/10 text-tertiary rounded-full text-label-sm font-label-sm mb-2">
+<span class="material-symbols-outlined text-[14px] animate-pulse-live" style="font-variation-settings: 'FILL' 1">fiber_manual_record</span>
+                    Encrypted Real-Time Tally
+                </span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">2024 Institutional Referendum</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Last updated: <span id="time-ago">just now</span> • <span id="precincts-reporting">84.00</span>% precincts reporting</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 border border-outline text-primary font-label-bold text-label-bold rounded-lg hover:bg-surface-container-low active:scale-95 transition-all">
+                    Download PDF Report
+                </button>
+</div>
+</div>
+</section>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-stack-md mb-stack-lg">
+<!-- Real-time Bar Chart Card -->
+<div class="md:col-span-8 bg-surface-container-lowest border border-outline-variant p-6 rounded-xl animate-content delay-1">
+<h3 class="font-headline-md text-headline-md mb-6">Vote Distribution</h3>
+<div class="space-y-8">
+<!-- Candidate A -->
+<div class="candidate-row p-2 -m-2 rounded-lg space-y-2 group">
+<div class="flex justify-between items-end">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
+<img class="w-full h-full object-cover" data-alt="Candidate portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuaNrrHsfTlOrxdoqjTXB1xhYVz1jz3DgI3l8XrHbTl2a3XHxhzSh-7ueO5_a_mNvoui5wYTJW7rQzu0OCAq7VJnelWhgVFb0l0CHZnCnLD8Ja7-xVIFYC3QIK5gme0raoD-N3FKb3lWIKlPTVvO0ZO03sbR8qpJ6jxguqkcRmnrpL4k_tYqURwom0KjzzUOvNbSg1hAyFR5qEQzjlcPM9-xC3un0sBaOwK25bD7SLvfxSIUUyYGLv91pgriq2KzEzHQv3YrE7Hy0d"/>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Helena Vance</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Progressive Coalition</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-md text-headline-md text-primary" id="vance-percent">52.4%</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant"><span id="vance-votes">1,240,402</span> votes</p>
+</div>
+</div>
+<div class="h-4 w-full bg-surface-container rounded-full overflow-hidden chart-bar-container">
+<div class="h-full bg-primary chart-bar-transition" id="vance-bar" style="width: 52.4%"></div>
+</div>
+</div>
+<!-- Candidate B -->
+<div class="candidate-row p-2 -m-2 rounded-lg space-y-2 group">
+<div class="flex justify-between items-end">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden ring-2 ring-transparent group-hover:ring-secondary/20 transition-all">
+<img class="w-full h-full object-cover" data-alt="Candidate portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW4SL5zuEk9fWvj2VyYU21BYkVOiyAvfCkYqAKy3LbFBXlDsfRq2wo9NVvjJLv8UvVgDEKsqzO4zoVoZHsc-3_1M_v-j_Ha56GFLa8Mb1zQtHn4saUbybMGtpsKhtfW-iWHMbGFAfw7K_TYXMD4jc6Owk-o45cWnM7sqGbdvVfLtRcslCk2uqVnqCkNDZNTeZvjdJf8YhE0TDQmnX7grwARhpClVEWSOEqQ5k4gjD-lmTmHTS6eGEbOVV3fy5bCRo8JCQb1aPzBf7c"/>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Arthur Sterling</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Unity Alliance</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-md text-headline-md text-secondary" id="sterling-percent">47.6%</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant"><span id="sterling-votes">1,126,890</span> votes</p>
+</div>
+</div>
+<div class="h-4 w-full bg-surface-container rounded-full overflow-hidden chart-bar-container">
+<div class="h-full bg-secondary chart-bar-transition" id="sterling-bar" style="width: 47.6%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Stats -->
+<div class="md:col-span-4 flex flex-col gap-4 animate-content delay-2">
+<div class="bg-primary-container p-6 rounded-xl text-on-primary hover:brightness-110 transition-all cursor-default">
+<p class="text-label-sm font-label-sm opacity-80 uppercase tracking-widest">Turnout Rate</p>
+<h4 class="font-headline-lg text-[48px] leading-tight" id="turnout-rate">68.2%</h4>
+<p class="text-body-md font-body-md mt-2">Highest participation in 12 years.</p>
+</div>
+<div class="bg-surface-container border border-outline-variant p-6 rounded-xl">
+<p class="text-label-sm font-label-bold text-on-surface-variant">Verification Status</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="material-symbols-outlined text-tertiary animate-pulse">lock</span>
+<p class="text-body-md font-body-md font-semibold text-on-surface">ZKP Validated</p>
+</div>
+<p class="text-label-sm font-label-sm mt-1 text-on-surface-variant">Cryptographic proof generated for all tallies.</p>
+</div>
+</div>
+<!-- Geographic Map Card -->
+<div class="md:col-span-12 bg-surface-container-lowest border border-outline-variant p-6 rounded-xl overflow-hidden relative min-h-[400px] animate-content delay-3">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline-md text-headline-md">Regional Distribution</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Vote density by precinct and district.</p>
+</div>
+<div class="flex gap-2">
+<button class="p-2 bg-surface rounded hover:bg-surface-container transition-all active:scale-90 border border-outline-variant">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="p-2 bg-surface rounded hover:bg-surface-container transition-all active:scale-90 border border-outline-variant">
+<span class="material-symbols-outlined">zoom_out</span>
+</button>
+</div>
+</div>
+<div class="w-full h-80 bg-surface-container-low rounded-lg relative overflow-hidden group">
+<div class="w-full h-full opacity-50">
+<img class="w-full h-full object-cover grayscale opacity-40 transition-transform duration-700 group-hover:scale-105" data-alt="Map visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlDZ6QlVK9kiWG23gUrx8wSy0Jk_ovJWn45FnJrnc5Z1k9989PyKwNO1A_YbEEjZJPGpTkPBPYWKFIXI3sKSihAfBIIfrsbp7LkNt2t4YkpDTfKv6_3kaP54xq_uGoKwzkFoWjYyiee2IKUV1UK9sJGVn7UwplU0p5FUlwobyE8S1EODoCBVvxtfOnLclIPYJCvzk9Z6WlfVHQKq8vNUe5Cg1w__EZJyjIhI-G2q1bFyzO0BMXdfW_BO2PFzSfSFmqLXvZ0s_cDHmG"/>
+</div>
+<!-- Mock Map Markers -->
+<div class="absolute top-1/4 left-1/3 w-4 h-4 bg-primary rounded-full animate-pulse shadow-[0_0_15px_rgba(0,58,181,0.5)]"></div>
+<div class="absolute bottom-1/3 right-1/4 w-3 h-3 bg-secondary rounded-full shadow-[0_0_10px_rgba(67,91,159,0.5)]"></div>
+<div class="absolute top-1/2 left-1/2 w-6 h-6 bg-primary/40 border-2 border-primary rounded-full animate-ping"></div>
+<div class="absolute bottom-4 right-4 glass-panel p-4 rounded-lg border border-outline-variant shadow-lg max-w-[200px] transition-all hover:-translate-y-1">
+<p class="font-label-bold text-label-bold mb-2">District 04 Insight</p>
+<div class="flex justify-between text-label-sm">
+<span>Vance</span>
+<span class="font-bold">62%</span>
+</div>
+<div class="w-full h-1 bg-surface-container mt-1">
+<div class="h-full bg-primary" style="width: 62%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Verification Explorer -->
+<div class="md:col-span-12 bg-inverse-surface text-inverse-on-surface p-10 rounded-2xl relative overflow-hidden animate-content" style="animation-delay: 0.4s">
+<div class="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[300px] absolute -right-20 -top-10">fingerprint</span>
+</div>
+<div class="relative z-10 max-w-2xl">
+<h2 class="font-headline-lg text-headline-lg mb-4">Verification Explorer</h2>
+<p class="text-body-lg font-body-lg opacity-80 mb-8">Confirm your ballot has been counted in the global ledger. Enter your anonymous receipt hash to view its inclusion status without compromising your privacy.</p>
+<form class="space-y-4" onsubmit="event.preventDefault(); handleVerification();">
+<label class="font-label-bold text-label-bold block opacity-90" for="hash-input">Ballot Receipt Hash (ZKP-SHA256)</label>
+<div class="flex flex-col sm:flex-row gap-4">
+<input autocomplete="off" class="flex-grow bg-white/10 border border-white/20 rounded-lg px-4 py-3 verification-code-input text-white focus:outline-none focus:ring-2 focus:ring-primary-container transition-all" id="hash-input" placeholder="SV-XXXX-XXXX-XXXX" type="text"/>
+<button class="px-8 py-3 bg-primary-container text-on-primary font-label-bold text-label-bold rounded-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2" id="verify-btn">
+<span>Verify My Vote</span>
+</button>
+</div>
+<p class="text-label-sm font-label-sm opacity-60">No personal data is linked to this hash. Verification uses zero-knowledge proofs.</p>
+</form>
+<!-- Result Message -->
+<div class="hidden mt-8 p-6 bg-tertiary-container/30 border border-tertiary-fixed-dim/30 rounded-xl flex items-start gap-4" id="verification-result">
+<div class="w-10 h-10 bg-tertiary-fixed text-on-tertiary-fixed rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">check_circle</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold" id="result-status">Verified</p>
+<p class="text-body-md font-body-md opacity-80" id="result-message">Vote included in Block #812-SV. Your vote was officially recorded in the decentralized ledger.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-md bg-surface-dim dark:bg-inverse-surface border-t border-outline-variant dark:border-outline">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-gutter max-w-container-max mx-auto gap-4">
+<div class="text-center md:text-left">
+<p class="font-label-bold text-label-bold text-on-surface">SecureVote Institutional</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 SecureVote Institutional. All rights reserved. Cryptographically secured.</p>
+</div>
+<nav class="flex flex-wrap justify-center gap-4">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Accessibility</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Security Whitepaper</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Contact Support</a>
+</nav>
+</div>
+</footer>
+<script>
+    // Live Ticker Simulation
+    let precinctPct = 84.00;
+    let vanceVotes = 1240402;
+    let sterlingVotes = 1126890;
+
+    function updateLiveStats() {
+        // Slowly increase precincts
+        if (precinctPct < 99.9) {
+            precinctPct += Math.random() * 0.05;
+            document.getElementById('precincts-reporting').innerText = precinctPct.toFixed(2);
+        }
+
+        // Ticker for votes
+        const vanceIncr = Math.floor(Math.random() * 50);
+        const sterlingIncr = Math.floor(Math.random() * 45);
+        vanceVotes += vanceIncr;
+        sterlingVotes += sterlingIncr;
+        
+        document.getElementById('vance-votes').innerText = vanceVotes.toLocaleString();
+        document.getElementById('sterling-votes').innerText = sterlingVotes.toLocaleString();
+
+        // Recalculate percentages
+        const total = vanceVotes + sterlingVotes;
+        const vPct = (vanceVotes / total) * 100;
+        const sPct = 100 - vPct;
+
+        document.getElementById('vance-percent').innerText = vPct.toFixed(1) + '%';
+        document.getElementById('sterling-percent').innerText = sPct.toFixed(1) + '%';
+        
+        document.getElementById('vance-bar').style.width = vPct.toFixed(1) + '%';
+        document.getElementById('sterling-bar').style.width = sPct.toFixed(1) + '%';
+
+        // Update time-ago (simulation)
+        const seconds = Math.floor(Date.now() / 1000) % 60;
+        document.getElementById('time-ago').innerText = seconds < 10 ? 'just now' : seconds + ' seconds ago';
+    }
+
+    // Interval for live ticker
+    setInterval(updateLiveStats, 3000);
+
+    // Verification Explorer Logic
+    function handleVerification() {
+        const input = document.getElementById('hash-input');
+        const btn = document.getElementById('verify-btn');
+        const result = document.getElementById('verification-result');
+        const originalText = btn.innerHTML;
+
+        if (!input.value.trim()) return;
+
+        // Loading state
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span><span>Verifying...</span>';
+        btn.classList.add('opacity-80');
+        result.classList.add('hidden');
+
+        setTimeout(() => {
+            // Success State
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            btn.classList.remove('opacity-80');
+            
+            result.classList.remove('hidden');
+            result.classList.add('animate-content');
+            
+            // Highlight result
+            result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 1800);
+    }
+
+    // Initialize entrance animations properly
+    window.addEventListener('DOMContentLoaded', () => {
+        const contents = document.querySelectorAll('.animate-content');
+        contents.forEach(el => {
+            // Reset width of bars to 0 for initial entrance feel
+            const bars = el.querySelectorAll('.chart-bar-transition');
+            bars.forEach(bar => {
+                const target = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => bar.style.width = target, 600);
+            });
+        });
+    });
+</script>
+</body></html>
