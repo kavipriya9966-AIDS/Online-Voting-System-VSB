@@ -1,3 +1,0 @@
-cd "D:\Voting System\OnlineVotingApp"
-dotnet build "OnlineVotingApp.csproj"cd "D:\Voting System\OnlineVotingApp"
-dotnet build "OnlineVotingApp.csproj"
